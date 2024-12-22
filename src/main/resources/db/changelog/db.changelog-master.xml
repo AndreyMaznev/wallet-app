@@ -12,6 +12,9 @@
                 <column name="balance" type="decimal">
                     <constraints nullable="false"/>
                 </column>
+                <column name="version" type="BIGINT">
+                    <constraints nullable="false"/>
+                </column>
             </createTable>
         </changeSet>
         </databaseChangeLog>

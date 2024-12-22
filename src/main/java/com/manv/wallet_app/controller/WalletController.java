@@ -34,10 +34,8 @@ public class WalletController {
 
     @PostMapping  (value = "/create")
     public ResponseEntity <?> createWallet(@RequestBody Wallet wallet) {
-        //todo delete this method before uploading
-        System.out.println("Received walled UUID + " + wallet.getUuid());
-        Wallet testingWallet = new Wallet(new BigDecimal(12312.1233));
-        System.out.println("New wallet UUID " + testingWallet.getUuid());
+        //todo delete this method before compose
+        Wallet testingWallet = new Wallet();
         walletService.createWallet(testingWallet);
         return new ResponseEntity<> (HttpStatus.OK);
     }

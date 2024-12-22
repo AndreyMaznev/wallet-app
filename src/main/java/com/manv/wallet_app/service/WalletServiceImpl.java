@@ -7,14 +7,17 @@ import com.manv.wallet_app.exception.WalletNotFoundException;
 import com.manv.wallet_app.model.Wallet;
 import com.manv.wallet_app.operation.WalletOperationRequest;
 import com.manv.wallet_app.repository.WalletRepository;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,9 +45,6 @@ public class WalletServiceImpl implements WalletService {
             System.out.println();
             return new ResponseEntity<>(wallet.get(), HttpStatus.OK);
         }
-
-//        if (wallet.isPresent()) return wallet.get().getBalance().setScale(2, BigDecimal.ROUND_HALF_UP);
-//        else throw new WalletNotFoundException("Wallet not found");
     }
 
 
@@ -56,29 +56,43 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void processOperation(WalletOperationRequest request) {
-        Optional <Wallet> wallet = walletRepository.findById(request.getWalletUUID());
-        if (wallet.isEmpty())
-            throw new WalletNotFoundException("Wallet not found");
-        if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) < 0)
-            throw new InvalidOperationException("Check spelling or value (should be positive number)");
-        Wallet currentWallet = wallet.get();
-
-        switch (request.getOperationType()) {
-            case DEPOSIT:
-                //Increasing current balance by the amount of the request
-                currentWallet.setBalance(currentWallet.getBalance().add (request.getAmount()));
-                break;
-            case WITHDRAW:
-                //-1 not enough money, 0 equals, +1 more than need
-                if (currentWallet.getBalance().compareTo(request.getAmount()) < 0) {
-                    throw new NotSufficientFundsException("Not sufficient funds");
+        int retries = 0;
+        while (retries < 5) {
+            retries++;
+            try {
+                Optional<Wallet> wallet = walletRepository.findById(request.getWalletUUID());
+                if (wallet.isEmpty())
+                    throw new WalletNotFoundException("Wallet not found");
+                if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) < 0)
+                    throw new InvalidOperationException("Check spelling or value (should be positive number)");
+                Wallet currentWallet = wallet.get();
+                switch (request.getOperationType()) {
+                    case DEPOSIT:
+                        //Increasing current balance by the amount of the request
+                        currentWallet.setBalance(currentWallet.getBalance().add(request.getAmount()));
+                        break;
+                    case WITHDRAW:
+                        //-1 not enough money, 0 equals, +1 enough money
+                        if (currentWallet.getBalance().compareTo(request.getAmount()) < 0) {
+                            throw new NotSufficientFundsException("Not sufficient funds");
+                        }
+                        currentWallet.setBalance(currentWallet.getBalance().subtract(request.getAmount()));
+                        break;
+                    default:
+                        throw new InvalidOperationException("Invalid operation type");
                 }
-                currentWallet.setBalance(currentWallet.getBalance().subtract(request.getAmount()));
-                break;
-            default:
-                throw new InvalidOperationException("Invalid JSON format");
+                walletRepository.save(currentWallet);
+                walletRepository.flush();
+                return;
+            } catch (OptimisticLockException e) {
+                System.out.println("Caught an exception" + e.getMessage() + "-----" + e.getClass());
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                    throw new ConcurrencyFailureException("Interrupted while waiting for lock");
+                }
+            }
         }
-        walletRepository.save(currentWallet);
     }
 }
-

@@ -1,10 +1,12 @@
 package com.manv.wallet_app.exception;
 
+import jakarta.persistence.OptimisticLockException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -19,7 +21,7 @@ public class GlobalExceptionHandler {
         logger.error (e.getMessage(), e);
         return new ResponseEntity <> (
                 new ApplicationError(HttpStatus.NOT_FOUND.value(),
-                        e.getMessage()),
+                        "Wallet not found"),
                 HttpStatus.NOT_FOUND);
     }
 
@@ -28,7 +30,7 @@ public class GlobalExceptionHandler {
         logger.error (e.getMessage(), e);
         return new ResponseEntity <> (
                 new ApplicationError(HttpStatus.BAD_REQUEST.value(),
-                        e.getMessage()),
+                        "Invalid operation"),
                 HttpStatus.BAD_REQUEST);
     }
 
@@ -37,12 +39,12 @@ public class GlobalExceptionHandler {
         logger.error (e.getMessage(), e);
         return new ResponseEntity <> (
                 new ApplicationError(HttpStatus.BAD_REQUEST.value(),
-                        e.getMessage()),
+                        "Not Sufficient Funds"),
                 HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity <ApplicationError> catchIllegalArgumentException (IllegalArgumentException e) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity <ApplicationError> catchIllegalArgumentException (MethodArgumentNotValidException e) {
         logger.error (e.getMessage(), e);
         return new ResponseEntity <> (
                 new ApplicationError(HttpStatus.BAD_REQUEST.value(),
@@ -55,7 +57,7 @@ public class GlobalExceptionHandler {
         logger.error (e.getMessage(), e);
         return new ResponseEntity <> (
                 new ApplicationError(HttpStatus.BAD_REQUEST.value(),
-                        "Invalid JSON format"),
+                        "Invalid JSON"),
                 HttpStatus.BAD_REQUEST);
     }
 
@@ -66,5 +68,11 @@ public class GlobalExceptionHandler {
                 new ApplicationError(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "Internal server error"),
                 HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler (OptimisticLockException.class)
+    public void catchOptimisticLockException (OptimisticLockException e) {
+        logger.error (e.getMessage(), e);
+        System.out.println("OPTIMISTIC LOCK EXCEPTION CAUGHT");
     }
 }
