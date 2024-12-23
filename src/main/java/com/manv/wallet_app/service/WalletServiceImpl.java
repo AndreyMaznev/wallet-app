@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.UUID;
 

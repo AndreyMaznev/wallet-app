@@ -1,14 +1,11 @@
 package com.manv.wallet_app.controller;
 
-import com.manv.wallet_app.model.Wallet;
 import com.manv.wallet_app.operation.WalletOperationRequest;
 import com.manv.wallet_app.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController

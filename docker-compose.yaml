@@ -17,7 +17,6 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=123456789
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-#      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
     depends_on:
       - postgres-wallet-app
@@ -31,7 +30,7 @@ services:
     command:
       - "postgres"
       - "-c"
-      - "max_connections=1050"
+      - "max_connections=1000"
       - "-c"
       - "shared_buffers=2GB"
       - "-c"
