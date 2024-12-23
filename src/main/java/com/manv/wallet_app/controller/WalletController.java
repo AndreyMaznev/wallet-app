@@ -28,16 +28,6 @@ public class WalletController {
 
     @PostMapping  (value = "/wallet")
     public ResponseEntity <?> processWalletOperation(@RequestBody WalletOperationRequest walletOperationRequest) {
-        walletService.processOperation(walletOperationRequest);
-        return new ResponseEntity<> (HttpStatus.OK);
+        return walletService.processOperation(walletOperationRequest);
     }
-
-    @PostMapping  (value = "/create")
-    public ResponseEntity <?> createWallet(@RequestBody Wallet wallet) {
-        //todo delete this method before compose
-        Wallet testingWallet = new Wallet();
-        walletService.createWallet(testingWallet);
-        return new ResponseEntity<> (HttpStatus.OK);
-    }
-
 }

@@ -10,7 +10,6 @@ import java.util.UUID;
 
 public interface WalletService {
     Optional<Wallet> getWalletByUUID(UUID uuid);
-    void processOperation (WalletOperationRequest request);
+    ResponseEntity <?> processOperation (WalletOperationRequest request);
     ResponseEntity <Wallet> getBalance(UUID uuid);
-    void createWallet(Wallet wallet);
 }

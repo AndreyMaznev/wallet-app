@@ -1,10 +1,7 @@
 package com.manv.wallet_app.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Version;
 
@@ -17,13 +14,13 @@ import java.util.UUID;
 @Table (name = "wallet")
 public class Wallet {
 
+    //Version is for DB positive lock
     @Version
     @Column (name = "version", nullable = false)
     private Long version;
 
     @Id
     @Column (name = "wallet_id", nullable = false)
-    @NotNull
     private UUID uuid;
 
     @Column (name = "balance", nullable = false)
@@ -36,13 +33,7 @@ public class Wallet {
     //Generating UUID in constructor with balance argument.
     public Wallet (BigDecimal balance) {
         this.uuid = generateUUID();
-        this.balance = balance;
-    }
-
-    //todo - DELETE THIS METHOD before upload
-    public Wallet(Long version, BigDecimal balance) {
-        this.uuid = generateUUID();
-        this.version = version;
+        this.version = 1L;
         this.balance = balance;
     }
 

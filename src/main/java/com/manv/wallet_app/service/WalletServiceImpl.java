@@ -48,14 +48,8 @@ public class WalletServiceImpl implements WalletService {
     }
 
 
-    //delete
     @Override
-    public void createWallet(Wallet wallet) {
-        walletRepository.save(wallet);
-    }
-
-    @Override
-    public void processOperation(WalletOperationRequest request) {
+    public ResponseEntity <Wallet> processOperation(WalletOperationRequest request) {
         int retries = 0;
         while (retries < 5) {
             retries++;
@@ -83,7 +77,7 @@ public class WalletServiceImpl implements WalletService {
                 }
                 walletRepository.save(currentWallet);
                 walletRepository.flush();
-                return;
+                return new ResponseEntity<>(currentWallet, HttpStatus.OK);
             } catch (OptimisticLockException e) {
                 System.out.println("Caught an exception" + e.getMessage() + "-----" + e.getClass());
                 try {
@@ -94,5 +88,6 @@ public class WalletServiceImpl implements WalletService {
                 }
             }
         }
+        throw new RuntimeException("Something went wrong");
     }
 }

@@ -1,26 +1,33 @@
-
-
+version: "3.7"
 
 services:
-  wallet_microservice:
-    container_name: wallet_microservice
+  wallet_application:
+    container_name: wallet_application
     build:
       context: .
       dockerfile: Dockerfile
+    networks:
+      - wallet-app
     ports:
       - 8080:8080
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123456789
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/wallet_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-wallet-app:5432/wallet_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=123456789
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      - postgres-wallet-app
 
-  postgres:
-    image: postgres:14.8-alpine3.18
+
+  postgres-wallet-app:
+    container_name: postgres-wallet-app
+    image: postgres:16-alpine
+    networks:
+      - wallet-app
     command:
       - "postgres"
       - "-c"
@@ -62,7 +69,6 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      #change credentials habrpguser -d habrdb" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       test: ["CMD-SHELL", "pg_isready -U postgres -d wallet_db"]
       interval: 10s
       timeout: 5s
@@ -74,6 +80,10 @@ services:
         limits:
           cpus: '1'
           memory: 4G
-
 volumes:
   wallet-data:
+
+networks:
+  wallet-app:
+    name: wallet-app
+    driver: bridge
