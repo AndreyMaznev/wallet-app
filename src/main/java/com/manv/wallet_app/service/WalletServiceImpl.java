@@ -46,6 +46,18 @@ public class WalletServiceImpl implements WalletService {
         }
     }
 
+    @Override
+    public ResponseEntity<?> createWallet(Wallet wallet) {
+        if (wallet == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (walletRepository.findByUuid(wallet.getUuid()).isPresent()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        walletRepository.save(wallet);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
 
     @Override
     public ResponseEntity <Wallet> processOperation(WalletOperationRequest request) {

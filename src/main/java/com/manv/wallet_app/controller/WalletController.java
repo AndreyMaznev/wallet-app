@@ -1,8 +1,10 @@
 package com.manv.wallet_app.controller;
 
+import com.manv.wallet_app.model.Wallet;
 import com.manv.wallet_app.operation.WalletOperationRequest;
 import com.manv.wallet_app.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,5 +28,13 @@ public class WalletController {
     @PostMapping  (value = "/wallet")
     public ResponseEntity <?> processWalletOperation(@RequestBody WalletOperationRequest walletOperationRequest) {
         return walletService.processOperation(walletOperationRequest);
+    }
+
+    @PostMapping  (value = "/create")
+    public ResponseEntity <?> createWallet(@RequestBody Wallet wallet) {
+        Wallet tempWallet = new Wallet(wallet.getBalance());
+        System.out.println("New wallet UUID " + tempWallet.getUuid());
+        walletService.createWallet(tempWallet);
+        return new ResponseEntity<> (HttpStatus.OK);
     }
 }
