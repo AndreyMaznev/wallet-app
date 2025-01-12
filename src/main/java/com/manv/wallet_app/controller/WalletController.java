@@ -37,4 +37,11 @@ public class WalletController {
         walletService.createWallet(tempWallet);
         return new ResponseEntity<> (HttpStatus.OK);
     }
+
+    @GetMapping  (value = "/delete/{WALLET_UUID}")
+    public ResponseEntity <?> deleteWallet(@PathVariable (name = "WALLET_UUID") UUID uuid) {
+        System.out.println("Deleting wallet with UUID " + uuid);
+        walletService.deleteWallet(uuid);
+        return new ResponseEntity<> (HttpStatus.OK);
+    }
 }

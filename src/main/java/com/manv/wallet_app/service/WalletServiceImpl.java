@@ -58,6 +58,14 @@ public class WalletServiceImpl implements WalletService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @Override
+    public ResponseEntity<?> deleteWallet(UUID uuid) {
+        Optional<Wallet> wallet = getWalletByUUID(uuid);
+        if (wallet.isEmpty()) throw new WalletNotFoundException("Wallet not found");
+        walletRepository.deleteById(uuid);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     @Override
     public ResponseEntity <Wallet> processOperation(WalletOperationRequest request) {

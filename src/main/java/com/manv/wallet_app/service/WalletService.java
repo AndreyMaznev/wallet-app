@@ -11,4 +11,5 @@ public interface WalletService {
     ResponseEntity <?> processOperation (WalletOperationRequest request);
     ResponseEntity <Wallet> getBalance(UUID uuid);
     ResponseEntity <?> createWallet (Wallet wallet);
+    ResponseEntity <?> deleteWallet (UUID uuid);
 }
